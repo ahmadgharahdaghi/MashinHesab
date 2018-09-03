@@ -9,14 +9,15 @@ enum class CurrentMode{
 }
 
 class MainActivity : AppCompatActivity() {
-    var labelString = ""
+    var labelString = "0"
     var currentMode = CurrentMode.None
     var lastButtonWasMode = false
-    var savedNumber = ""
+    var savedNumber = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setupCalculator()
     }
 
     fun setupCalculator(){
@@ -46,25 +47,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun didPressEqual(){
-
+        var labelInt = this.labelString.toInt()
+        when(currentMode) {
+            CurrentMode.Plus -> labelInt += savedNumber
+            CurrentMode.Minus -> labelInt = savedNumber - labelInt
+            CurrentMode.Multy -> labelInt *= savedNumber
+            CurrentMode.None -> return
+        }
+        labelString = labelInt.toString()
+        updateText()
     }
 
     fun didPressClear(){
-
+        labelString = "0"
+        currentMode = CurrentMode.None
+        lastButtonWasMode = false
+        savedNumber = 0
+        textView.setText("0")
     }
 
     fun didPressNumber(num:Int){
-        labelString = "$labelString$num"
-        updateText()
 
+        if(lastButtonWasMode) {
+            savedNumber = labelString.toInt()
+            labelString = "$num"
+            lastButtonWasMode = false
+        }
+        else  labelString = "$labelString$num"
+        updateText()
     }
 
     fun changeMode(target:CurrentMode){
-
+        lastButtonWasMode = true
+        currentMode = target
     }
 
     fun updateText(){
-        textView.text = labelString
+        labelString = labelString.toInt().toString()
+        textView.setText(labelString)
+
     }
 
 }
